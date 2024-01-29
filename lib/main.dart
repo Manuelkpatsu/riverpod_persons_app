@@ -98,26 +98,39 @@ class HomePage extends ConsumerWidget {
         builder: (context, ref, child) {
           final dataModel = ref.watch(personsProvider);
 
-          return ListView.builder(
-            itemCount: dataModel.count,
-            itemBuilder: (context, index) {
-              final person = dataModel.persons[index];
-              return ListTile(
-                onTap: () async {
-                  final updatedPerson = await createOrUpdatePersonDialog(context, person);
-                  if (updatedPerson != null) {
-                    dataModel.update(updatedPerson: updatedPerson);
-                  }
-                },
-                title: Text(person.displayName),
-                trailing: IconButton(
-                  splashRadius: 20,
-                  onPressed: () => dataModel.remove(person: person),
-                  icon: const Icon(Icons.delete_rounded, color: Colors.red),
-                ),
-              );
-            },
-          );
+          return dataModel.persons.isNotEmpty
+              ? ListView.builder(
+                  itemCount: dataModel.count,
+                  itemBuilder: (context, index) {
+                    final person = dataModel.persons[index];
+                    return ListTile(
+                      onTap: () async {
+                        final updatedPerson = await createOrUpdatePersonDialog(context, person);
+                        if (updatedPerson != null) {
+                          dataModel.update(updatedPerson: updatedPerson);
+                        }
+                      },
+                      title: Text(person.displayName),
+                      trailing: IconButton(
+                        splashRadius: 20,
+                        onPressed: () => dataModel.remove(person: person),
+                        icon: const Icon(Icons.delete_rounded, color: Colors.red),
+                      ),
+                    );
+                  },
+                )
+              : const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Icon(Icons.people_alt_rounded, size: 60),
+                    SizedBox(height: 10),
+                    Text(
+                      'There are no persons.\nClick on the button to add one.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
         },
       ),
       floatingActionButton: FloatingActionButton(
